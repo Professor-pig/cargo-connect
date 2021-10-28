@@ -150,4 +150,22 @@ class Robot:
                 break
             time.sleep(0.01)
         self.stop()
+    
+    def pivot(self, deg: (int, float), vel: (int, float) = 150) -> None:
+        print("PIVOT", deg)
+        if deg > 0:
+            direction = 50
+        elif deg < 0:
+            direction = -50
+        self.reset_motors()
+        self.reset_gyro()
+        self.start_moving_direction(direction, vel)
+        deg = abs(deg)
+        while True:
+            angle = abs(self.gyro.angle())
+            print(angle, deg)
+            if angle >= deg:
+                break
+            time.sleep(0.01)
+        self.stop()
             

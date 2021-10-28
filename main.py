@@ -21,14 +21,17 @@ import threading
 robot = Robot()
 from_home = True
 
-def route_3():
-    def func_1():
-        time.sleep(0.8)
-        robot.A.spin_for_deg(500)
-    
-    def func_2():
-        robot.advance(10)
 
+def func_1():
+    time.sleep(0.8)
+    robot.A.spin_for_deg(500)
+
+
+def func_2():
+    robot.advance(10)
+
+
+def route_3():
     if from_home:
         thread_1 = threading.Thread(target=func_1)
         robot.A.spin_for_deg(-1300)
@@ -90,14 +93,13 @@ def route_1():
     robot.advance(19, 100, 0.979)
     
     put_down_left_arm()
-    
-
-
-    
 
 
 robot.brick.speaker.set_volume(5)
 robot.brick.speaker.beep(440, 200)
-route_1()
+# route_1()
+for _ in range(4):
+    robot.pivot(-90)
+    time.sleep(0.5)
 
 robot.brick.speaker.beep(440, 200)

@@ -41,18 +41,18 @@ def route_3():
         robot.advance_without_acceleration(25, 500, 0.9)
         robot.A.spin_for_deg(-500)
         thread_1.start()
-        robot.advance(40, 600, 0.9)
+        robot.advance(36, 600, 0.9)
     
     thread_2 = threading.Thread(target=func_2)
-    robot.retreat(4)
+    # robot.retreat(4) do not need retreat
     robot.A.spin_for_deg(-600)
     robot.turn(-65)
     thread_2.start()
-    robot.A.spin_for_deg(1790)
+    robot.A.spin_for_deg(2000)
     robot.advance(27)
     robot.D.spin_for_deg(-100)
-    robot.turn(34)
-    robot.advance(28)
+    robot.turn(32)
+    # robot.advance(28)
 
 def put_down_left_arm():
     robot.A.spin_for_deg(-500)

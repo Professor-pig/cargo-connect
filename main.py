@@ -6,7 +6,7 @@ import pybricks.hubs as hub
 # from pybricks.ev3devices import Motor, ColorSensor, InfraredSensor, GyroSensor
 import pybricks.ev3devices as devices
 
-# from pybricks.parameters import Port, Stop, Direction, Button, Color ,  [oiufeds43Q`  `YRESA`]
+# from pybricks.parameters import Port, Stop, Direction, Button, Color
 import pybricks.parameters as parameters
 
 # from pybricks.tools import wait, StopWatch, DataLog

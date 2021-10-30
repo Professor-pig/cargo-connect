@@ -26,7 +26,7 @@ class Robot:
 
         self.colour_left = devices.ColorSensor(parameters.Port.S2)
         self.colour_right = devices.ColorSensor(parameters.Port.S3)
-        #self.colour_middle = devices.ColorSensor(parameters.Port.S1)
+        self.colour_middle = devices.ColorSensor(parameters.Port.S1)
         self.gyro = devices.GyroSensor(parameters.Port.S4)
 
         # self.drivebase = robotics.DriveBase(self.B.device, self.C.device, 62.4, 150)
@@ -56,6 +56,7 @@ class Robot:
     def reset_gyro(self) -> None:
         while self.gyro.angle():
             self.gyro.reset_angle(0)
+            time.sleep(0.01)
     
     def start_moving_direction(self, direction: (int, float) = 0, vel: (int, float) = 0):
         print("START MOVING", vel, direction)
@@ -105,12 +106,31 @@ class Robot:
             dif = C_deg - B_deg
             # print(C_vel)
             self.start_moving_direction(dif * Robot.straight_line_adherence_constant, cur_vel)
-        self.B.set_scaling(Robot.B_scaling)
         self.stop()
+        self.B.set_scaling(Robot.B_scaling)
     
     def advance(self, cm: (int, float), vel: (int, float) = 500, B_scaling: float = 0.0) -> None:
         print("ADVANCE", cm)
         self.advance_by_deg(cm * Robot.c_to_d, vel, B_scaling)
+    
+    def advance_with_gyro(self, cm: (int, float), vel: (int, float) = 500) -> None:
+        self.B.reset()
+        self.C.reset()
+        angle = self.gyro.angle()
+        cur_vel = 0
+        if vel > 0:
+            acceleration = Robot.steady_acceleration_constant
+        elif vel < 0:
+            acceleration = -Robot.steady_acceleration_constant
+        while abs(self.B.get_deg()) < deg and abs(self.C.get_deg()) < deg:
+            if abs(cur_vel) < abs(vel):
+                cur_vel += acceleration
+                self.B.set_vel(cur_vel)
+                self.C.set_vel(cur_vel)
+            B_deg, C_deg = self.B.get_deg(), self.C.get_deg()
+            deviation = 
+            self.start_moving_direction(dif * Robot.straight_line_adherence_constant, cur_vel)
+        self.stop()
     
     def advance_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, B_scaling: float = 0.0) -> None:
         deg = cm * Robot.c_to_d
@@ -143,9 +163,16 @@ class Robot:
         self.reset_gyro()
         self.start_moving_direction(direction, vel)
         deg = abs(deg)
+        last_angle = 0
         while True:
             angle = abs(self.gyro.angle())
+            if abs(angle - last_angle) > 10:
+                print(angle)
+                print("wrong angle")
+                self.reset_gyro()
+                continue
             print(angle, deg)
+            last_angle = angle
             if angle >= deg:
                 break
             time.sleep(0.01)

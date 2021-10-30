@@ -32,36 +32,40 @@ def func_2():
 
 
 def route_3():
+    stop_at_chichen = False
     if from_home:
         thread_1 = threading.Thread(target=func_1)
         robot.A.spin_for_deg(-1300)
-        robot.advance_without_acceleration(60, 500, 0.79)
+        robot.advance_without_acceleration(60, 500, 0.75)
         time.sleep(0.5)
         robot.A.spin_for_deg(1200)
-        robot.advance_without_acceleration(25, 500, 0.9)
-        robot.A.spin_for_deg(-500)
-        thread_1.start()
-        robot.advance(36, 600, 0.9)
-    
-    thread_2 = threading.Thread(target=func_2)
-    # robot.retreat(4) do not need retreat
-    robot.A.spin_for_deg(-600)
-    robot.turn(-65)
-    thread_2.start()
-    robot.A.spin_for_deg(2000)
-    robot.advance(27)
-    robot.D.spin_for_deg(-100)
-    robot.turn(32)
-    # robot.advance(28)
+
+        if not stop_at_chichen:
+            robot.advance_without_acceleration(25, 500, 0.9)
+            robot.A.spin_for_deg(-500)
+            thread_1.start()
+            robot.advance(36, 600, 0.9)
+
+    if not stop_at_chichen:    
+        thread_2 = threading.Thread(target=func_2)
+        # robot.retreat(4) do not need retreat
+        robot.A.spin_for_deg(-600)
+        robot.turn(-65)
+        thread_2.start()
+        robot.A.spin_for_deg(2000)
+        robot.advance(27)
+        robot.D.spin_for_deg(-100)
+        robot.turn(32)
+        # robot.advance(28)
 
 def put_down_left_arm():
-    robot.A.spin_for_deg(-500)
+    robot.A.spin_for_deg(-400)
 
 def put_half_down_left_arm():
     robot.A.spin_for_deg(-300)
 
 def raise_up_left_arm():
-    robot.A.spin_for_deg(500)
+    robot.A.spin_for_deg(400)
 
 def raise_half_up_left_arm():
     robot.A.spin_for_deg(300)
@@ -70,36 +74,74 @@ def put_down_folk():
     robot.D.spin_for_deg(300)
     
 def route_1():
-    # robot.advance(75, 300, 0.979)
-    # time.sleep(0.1)
-    # robot.turn(50)
-    robot.advance(91, 300, 0.979)
+    print("route1")
+    robot.advance(84, 300, 0.979)
     time.sleep(0.1)
-    robot.turn(35)
+    robot.turn(36)
     
-    threading.Thread(target=put_half_down_left_arm).start()
-    # threading.Thread(target=put_down_folk).start()
-    #push
-    robot.advance(47, 300, 0.979)
-    #raise up arm
-    raise_half_up_left_arm()
+    # threading.Thread(target=put_down_left_arm).start()
+
+    do_not_push = True
+    if do_not_push:    
+        robot.advance(70.5, 300, 0.979)
+    else:
+        robot.advance(34, 300, 0.979)
+        #push
+        put_down_left_arm()
+        robot.advance_without_acceleration(14, 400, 0.7)
     
-    robot.advance(34, 300, 0.979)
+        #raise up arm
+        raise_up_left_arm()
+    
+        robot.advance(30, 300, 0.979)
+    
     time.sleep(0.1)
-    robot.turn(90)
+    robot.pivot(92)
     time.sleep(0.1)
     put_down_folk()
     robot.advance(16, 300, 0.979)
-    robot.advance(19, 100, 0.979)
+    robot.advance(12, 100, 0.979)
     
-    put_down_left_arm()
+    # put_down_left_arm()
 
+def route_4():
+    # robot.advance(73, 300, 0.979)
+    # time.sleep(0.1)
+    robot.pivot(30, 300)
+
+def route_2():
+    print("route2")
+
+
+def test_route_1():
+    def test_route_1_turn():
+        angle_offset = 2
+        for _ in range(4):
+            # robot.pivot(90)
+            # robot.turn(-90 + angle_offset, 100)
+            robot.turn(90 - angle_offset, 100)
+            time.sleep(0.5)
+
+    def test_route_1_advance():
+        robot.advance(100, 300, 0.965)
+
+    test_route_1_advance()
 
 robot.brick.speaker.set_volume(5)
 robot.brick.speaker.beep(440, 200)
-# route_1()
-for _ in range(4):
-    robot.pivot(-90)
-    time.sleep(0.5)
+debug = True
+if debug:
+    test_route_1()
+else:    
+    attachment_color = robot.colour_middle.color()
+    print(attachment_color)
+    if attachment_color == parameters.Color.YELLOW:
+        route_4()
+    elif attachment_color == parameters.Color.RED:
+        route_1()
+    elif attachment_color == parameters.Color.BLUE:
+        route_3()
+    elif attachment_color == parameters.Color.BLACK:
+        route_2()
 
 robot.brick.speaker.beep(440, 200)

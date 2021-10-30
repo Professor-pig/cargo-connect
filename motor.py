@@ -63,4 +63,5 @@ class Motor:
             vel = self.vel
         self.device.run_angle(vel, -deg * self.scaling, Motor.stopping[stop_mode], wait)
 
-        
+    def hold(self):
+         self.device.hold()   

@@ -18,10 +18,10 @@ class Robot:
 
     def __init__(self):
 
-        self.A = motor.Motor(parameters.Port.A)
+        self.left_arm = motor.Motor(parameters.Port.A)
         self.left_wheel = motor.Motor(parameters.Port.B)
         self.right_wheel = motor.Motor(parameters.Port.C)
-        self.D = motor.Motor(parameters.Port.D)
+        self.right_arm = motor.Motor(parameters.Port.D)
         self.brick = hub.EV3Brick()
 
         self.colour_left = devices.ColorSensor(parameters.Port.S2)
@@ -41,10 +41,10 @@ class Robot:
         self.calibrate_gyro()
     
     def reset_motors(self) -> None:
-        self.A.reset()
+        self.left_arm.reset()
         self.left_wheel.reset()
         self.right_wheel.reset()
-        self.D.reset()
+        self.right_arm.reset()
 
     def calibrate_gyro(self, delay: int = 0.1) -> None:
         self.reset_gyro()
@@ -95,8 +95,11 @@ class Robot:
         cur_vel = 0
         if vel > 0:
             acceleration = Robot.steady_acceleration_constant
+            straight_line_adherence = Robot.straight_line_adherence_constant
         elif vel < 0:
             acceleration = -Robot.steady_acceleration_constant
+            straight_line_adherence = -Robot.straight_line_adherence_constant
+
         while abs(self.left_wheel.get_deg()) < deg and abs(self.right_wheel.get_deg()) < deg:
             if abs(cur_vel) < abs(vel):
                 cur_vel += acceleration
@@ -105,7 +108,7 @@ class Robot:
             B_deg, C_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
             dif = C_deg - B_deg
             # print(right_vel)
-            self.start_moving_direction(dif * Robot.straight_line_adherence_constant, cur_vel)
+            self.start_moving_direction(dif * straight_line_adherence, cur_vel)
         self.stop()
         self.left_wheel.set_scaling(Robot.B_scaling)
     

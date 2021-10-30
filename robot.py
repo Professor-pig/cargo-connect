@@ -128,8 +128,8 @@ class Robot:
                 self.B.set_vel(cur_vel)
                 self.C.set_vel(cur_vel)
             B_deg, C_deg = self.B.get_deg(), self.C.get_deg()
-            deviation = 
-            self.start_moving_direction(dif * Robot.straight_line_adherence_constant, cur_vel)
+            deviation = gyro - self.gyro.angle()
+            self.start_moving_direction(deviation * Robot.straight_line_adherence_constant, cur_vel)
         self.stop()
     
     def advance_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, B_scaling: float = 0.0) -> None:

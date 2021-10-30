@@ -132,6 +132,7 @@ robot.brick.speaker.beep(440, 200)
 debug = True
 if debug:
     test_route_1()
+    # robot.advance(100)
 else:    
     attachment_color = robot.colour_middle.color()
     print(attachment_color)

@@ -59,31 +59,34 @@ def route_3():
         # robot.advance(28)
 
 def put_down_left_arm():
-    robot.A.spin_for_deg(-400)
+    robot.A.spin_for_deg(-550)
 
 def put_half_down_left_arm():
     robot.A.spin_for_deg(-300)
 
-def raise_up_left_arm():
-    robot.A.spin_for_deg(400)
+def raise_left_arm():
+    robot.A.spin_for_deg(555)
 
 def raise_half_up_left_arm():
     robot.A.spin_for_deg(300)
 
-def put_down_folk():
+def put_down_fork():
     robot.D.spin_for_deg(300)
-    
+
+def lift_fork():
+    robot.D.spin_for_deg(-305)
+
 def route_1():
     print("route1")
     robot.advance(84, 300, 0.979)
     time.sleep(0.1)
-    robot.turn(36)
+    robot.turn(33)
     
     # threading.Thread(target=put_down_left_arm).start()
 
     do_not_push = True
     if do_not_push:    
-        robot.advance(70.5, 300, 0.979)
+        robot.advance(85, 300, 0.98)
     else:
         robot.advance(34, 300, 0.979)
         #push
@@ -96,13 +99,14 @@ def route_1():
         robot.advance(30, 300, 0.979)
     
     time.sleep(0.1)
-    robot.pivot(92)
+    robot.turn(89)
     time.sleep(0.1)
-    put_down_folk()
-    robot.advance(16, 300, 0.979)
-    robot.advance(12, 100, 0.979)
-    
-    # put_down_left_arm()
+    put_down_fork()
+    robot.advance(26, 300, 0.979)
+    lift_fork()
+    put_down_left_arm()
+    raise_left_arm()
+    retreat(40)
 
 def route_4():
     # robot.advance(73, 300, 0.979)
@@ -127,12 +131,14 @@ def test_route_1():
 
     test_route_1_advance()
 
+def test_route_2():
+    robot.D.spin_for_deg(30)
+
 robot.brick.speaker.set_volume(5)
 robot.brick.speaker.beep(440, 200)
-debug = True
+debug = False
 if debug:
-    test_route_1()
-    # robot.advance(100)
+    put_down_left_arm()
 else:    
     attachment_color = robot.colour_middle.color()
     print(attachment_color)

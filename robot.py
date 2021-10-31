@@ -14,14 +14,14 @@ class Robot:
     straight_line_adherence_constant = -0.4
     large_motor_max = 1000
     c_to_d = 18.364031
-    left_wheel_scaling = 0.984
+    left_scaling = 0.984
 
     def __init__(self):
 
-        self.left_arm = motor.Motor(parameters.Port.A)
+        self.left_motor = motor.Motor(parameters.Port.A)
         self.left_wheel = motor.Motor(parameters.Port.B)
         self.right_wheel = motor.Motor(parameters.Port.C)
-        self.right_arm = motor.Motor(parameters.Port.D)
+        self.right_motor = motor.Motor(parameters.Port.D)
         self.brick = hub.EV3Brick()
 
         self.colour_left = devices.ColorSensor(parameters.Port.S2)
@@ -32,7 +32,7 @@ class Robot:
         # self.drivebase = robotics.DriveBase(self.left_wheel.device, self.right_wheel.device, 62.4, 150)
         # self.drivebase.settings(100, 20, 100, 20)
 
-        self.left_wheel.set_scaling(Robot.left_wheel_scaling)
+        self.left_wheel.set_scaling(Robot.left_scaling)
         self.reset_and_calibrate()
         self.stop_mode = "brake"
     
@@ -41,10 +41,10 @@ class Robot:
         self.calibrate_gyro()
     
     def reset_motors(self) -> None:
-        self.left_arm.reset()
+        self.left_motor.reset()
         self.left_wheel.reset()
         self.right_wheel.reset()
-        self.right_arm.reset()
+        self.right_motor.reset()
 
     def calibrate_gyro(self, delay: int = 0.1) -> None:
         self.reset_gyro()
@@ -87,34 +87,33 @@ class Robot:
         self.left_wheel.stop(stop_mode)
         self.right_wheel.stop(stop_mode)
 
-    def advance_by_deg(self, deg: (int, float), vel: (int, float) = 1000, left_wheel_scaling: float = 0.0) -> None:
-        if left_wheel_scaling:
-            self.left_wheel.set_scaling(left_wheel_scaling)
+    def advance_by_deg(self, deg: (int, float), vel: (int, float) = 1000, left_scaling: float = 0.0) -> None:
+        if left_scaling:
+            self.left_wheel.set_scaling(left_scaling)
         self.left_wheel.reset()
         self.right_wheel.reset()
         cur_vel = 0
         if vel > 0:
             acceleration = Robot.steady_acceleration_constant
-            straight_line_adherence = Robot.straight_line_adherence_constant
+            dif_scaling = Robot.straight_line_adherence_constant
         elif vel < 0:
             acceleration = -Robot.steady_acceleration_constant
-            straight_line_adherence = -Robot.straight_line_adherence_constant
+            dif_scaling = -Robot.straight_line_adherence_constant
 
         while abs(self.left_wheel.get_deg()) < deg and abs(self.right_wheel.get_deg()) < deg:
             if abs(cur_vel) < abs(vel):
                 cur_vel += acceleration
                 self.left_wheel.set_vel(cur_vel)
                 self.right_wheel.set_vel(cur_vel)
-            left_wheel_deg, right_wheel_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
-            dif = right_wheel_deg - left_wheel_deg
-            # print(right_vel)
-            self.start_moving_direction(dif * straight_line_adherence, cur_vel)
+            left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+            dif = right_deg - left_deg
+            self.start_moving_direction(dif * dif_scaling, cur_vel)
         self.stop()
-        self.left_wheel.set_scaling(Robot.left_wheel_scaling)
+        self.left_wheel.set_scaling(Robot.left_scaling)
     
-    def advance(self, cm: (int, float), vel: (int, float) = 500, left_wheel_scaling: float = 0.0) -> None:
+    def advance(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
         print("ADVANCE", cm)
-        self.advance_by_deg(cm * Robot.c_to_d, vel, left_wheel_scaling)
+        self.advance_by_deg(cm * Robot.c_to_d, vel, left_scaling)
     
     def advance_with_gyro(self, cm: (int, float), vel: (int, float) = 300) -> None:
         print("advance_with_gyro ", cm)
@@ -133,27 +132,27 @@ class Robot:
                 cur_vel += acceleration
                 self.left_wheel.set_vel(cur_vel)
                 self.right_wheel.set_vel(cur_vel)
-            left_wheel_deg, right_wheel_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+            left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
             cur_angle = self.gyro.angle()
             deviation = cur_angle - angle
             print(deviation, cur_angle, angle)
             self.start_moving_direction(deviation * -15.0, cur_vel)
         self.stop()
-        self.left_wheel.set_scaling(Robot.left_wheel_scaling)
+        self.left_wheel.set_scaling(Robot.left_scaling)
     
-    def advance_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, left_wheel_scaling: float = 0.0) -> None:
+    def advance_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
         deg = cm * Robot.c_to_d
-        if left_wheel_scaling:
-            self.left_wheel.set_scaling(left_wheel_scaling)
+        if left_scaling:
+            self.left_wheel.set_scaling(left_scaling)
         self.left_wheel.reset()
         self.right_wheel.reset()
         self.left_wheel.set_vel(vel)
         self.right_wheel.set_vel(vel)
         while abs(self.left_wheel.get_deg()) < deg and abs(self.right_wheel.get_deg()) < deg:
-            left_wheel_deg, right_wheel_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
-            dif = right_wheel_deg - left_wheel_deg
+            left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+            dif = right_deg - left_deg
             self.start_moving_direction(dif * Robot.straight_line_adherence_constant, vel)
-        self.left_wheel.set_scaling(Robot.left_wheel_scaling)
+        self.left_wheel.set_scaling(Robot.left_scaling)
         self.stop()
     
     def advance_drivebase(self, cm):

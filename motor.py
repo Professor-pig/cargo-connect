@@ -62,6 +62,20 @@ class Motor:
         if not vel:
             vel = self.vel
         self.device.run_angle(vel, -deg * self.scaling, Motor.stopping[stop_mode], wait)
+    
+    def spin_to(self, pos: int = 0, vel: (int, float) = 2000, stop_mode: str = "") -> None:
+        cur_deg = self.device.angle()
+        if pos > cur_deg:
+            self.device.run(vel)
+            while pos > self.device.angle():
+                time.sleep(0.01)
+            self.device.stop(stop_mode)
+        elif pos < cur_deg:
+            self.device.run(-vel)
+            while pos < self.device.angle():
+                time.sleep(0.01)
+            self.device.stop(stop_mode)
+
 
     def hold(self):
          self.device.hold()   

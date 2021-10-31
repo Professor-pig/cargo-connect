@@ -64,7 +64,7 @@ def route_3():
     #     robot.turn(32)
     #     # robot.advance(28)
 
-def put_down_left_arm():
+def lower_left_arm():
     robot.left_arm.spin_for_deg(-550)
 
 def put_half_down_left_arm():
@@ -82,10 +82,25 @@ def put_down_fork():
 def lift_fork():
     robot.right_arm.spin_for_deg(-305)
 
+def push_helicopter():
+    robot.retreat(74, 300)
+    robot.turn(51)
+    robot.retreat(16, 300)
+    robot.advance(16, 300)
+    robot.turn(-51)
+
+def push_train():
+    lower_left_arm()
+    robot.advance(74)
+    raise_left_arm()
+
 def route_1_go_home_with_pushing_helicopter():
+    # push helicopter
     robot.retreat(33, 300)
     robot.turn(51)
     robot.retreat(16, 300)
+
+    # return home
     robot.advance(34, 300)
     robot.turn(40)
     robot.advance(73, 300)
@@ -100,7 +115,7 @@ def route_1():
     time.sleep(0.1)
     robot.turn(33)
     
-    # threading.Thread(target=put_down_left_arm).start()
+    # threading.Thread(target=lower_left_arm).start()
 
     do_not_push = True
     if do_not_push:    
@@ -108,7 +123,7 @@ def route_1():
     else:
         robot.advance(34, 300, 0.979)
         #push
-        put_down_left_arm()
+        lower_left_arm()
         robot.advance_without_acceleration(14, 400, 0.7)
     
         #raise up arm
@@ -122,13 +137,13 @@ def route_1():
     put_down_fork()
     robot.advance(26, 300, 0.979)
     lift_fork()
-    put_down_left_arm()
+    lower_left_arm()
     raise_left_arm()
     
     robot.retreat(41, 300)
 
     # push train
-    put_down_left_arm()
+    lower_left_arm()
     robot.advance(41, 300)
     raise_left_arm()
 

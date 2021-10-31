@@ -19,10 +19,10 @@ from robot import Robot
 import threading
 
 robot = Robot()
-from_home = True
 
 
-def func_1():
+
+def arm_goes_back_with_pushing_west_bridge():
     time.sleep(0.8)
     robot.left_arm.spin_for_deg(500)
 
@@ -32,31 +32,37 @@ def func_2():
 
 
 def route_3():
+    from_home = True
     stop_at_chichen = False
     if from_home:
-        thread_1 = threading.Thread(target=func_1)
-        robot.left_arm.spin_for_deg(-1300)
-        robot.advance_without_acceleration(60, 500, 0.75)
-        time.sleep(0.5)
-        robot.left_arm.spin_for_deg(1200)
+        arm_goes_back_with_pushing_west_bridge_thread = threading.Thread(target=arm_goes_back_with_pushing_west_bridge)
+        robot.left_arm.spin_for_deg(-1300) # push truck out home
 
         if not stop_at_chichen:
-            robot.advance_without_acceleration(25, 500, 0.9)
-            robot.left_arm.spin_for_deg(-500)
-            thread_1.start()
-            robot.advance(36, 600, 0.9)
+            robot.advance_without_acceleration(60, 500, 0.79)
+            # time.sleep(0.1)
+            # robot.left_arm.spin_for_deg(1200) #arm goes back, release truck
+            # robot.advance_without_acceleration(25, 500, 0.9) 
+            # robot.left_arm.spin_for_deg(-500) #arm goes out, preparing to push west bridge
+            # arm_goes_back_with_pushing_west_bridge_thread.start()
+            # robot.advance(36, 600, 0.9) #keep going and pushing west bridge
 
-    if not stop_at_chichen:    
-        thread_2 = threading.Thread(target=func_2)
-        # robot.retreat(4) do not need retreat
-        robot.left_arm.spin_for_deg(-600)
-        robot.turn(-65)
-        thread_2.start()
-        robot.left_arm.spin_for_deg(2000)
-        robot.advance(27)
-        robot.right_arm.spin_for_deg(-100)
-        robot.turn(32)
-        # robot.advance(28)
+        else:
+            robot.advance_with_gyro(60, 500)
+            time.sleep(0.5)
+            robot.left_arm.spin_for_deg(1200)
+
+    # if not stop_at_chichen:    
+    #     thread_2 = threading.Thread(target=func_2)
+    #     # robot.retreat(4) do not need retreat
+    #     robot.left_arm.spin_for_deg(-600)
+    #     robot.turn(-65)
+    #     thread_2.start()
+    #     robot.left_arm.spin_for_deg(2000)
+    #     robot.advance(27)
+    #     robot.right_arm.spin_for_deg(-100)
+    #     robot.turn(32)
+    #     # robot.advance(28)
 
 def put_down_left_arm():
     robot.left_arm.spin_for_deg(-550)
@@ -86,7 +92,7 @@ def route_1_go_home_with_pushing_helicopter():
     robot.turn(-31)
     robot.advance(24, 300)
     robot.turn(47)
-    robot.advance(70)
+    robot.advance_without_acceleration(70, 1000)
 
 def route_1():
     print("route1")
@@ -167,11 +173,13 @@ def route_2():
 
 
 robot.brick.speaker.set_volume(5)
-robot.brick.speaker.beep(440, 200)
 debug = False
 if debug:
-    route_1_go_home_with_pushing_helicopter()
+    # route_1_go_home_with_pushing_helicopter()
+    robot.left_arm.spin_for_deg(-1300)
+    robot.advance_with_gyro(60, 500)
 else:    
+    robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()
     print(attachment_color)
     if attachment_color == parameters.Color.YELLOW:

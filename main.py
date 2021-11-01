@@ -24,21 +24,26 @@ robot = Robot()
 
 def arm_goes_back_with_pushing_west_bridge():
     time.sleep(0.8)
-    robot.left_motor.spin_for_deg(500)
+    robot.left_motor.spin_for_deg(600)
 
 
-def func_2():
+def go_to_cargo_connect_circle():
     robot.advance(10)
     print("fun_2 end")
 
-def raise_up_front():
-    robot.right_motor.spin_for_deg(-300) 
+def release_hinged():
+    time.sleep(0.3)
+    robot.left_motor.spin_for_deg(1100)
+
+def raise_front_gate():
+    robot.right_motor.spin_for_deg(-300)
 
 def route_3():
     print("route 3")
     route_3_stage_1 = True
-    route_3_stage_2 = True 
-    route_3_go_home = False # go home
+    route_3_stage_2 = True
+    route_3_go_home = True # go home
+    push_east_bridge = False
     if route_3_stage_1:
         arm_goes_back_with_pushing_west_bridge_thread = threading.Thread(target=arm_goes_back_with_pushing_west_bridge)
         robot.left_motor.spin_for_deg(-1200) # push truck out home
@@ -53,20 +58,25 @@ def route_3():
         robot.advance(37, 600, 0.9) # keep going and pushing west bridge
 
     if route_3_stage_2:
-        thread_2 = threading.Thread(target=func_2)
-        # robot.retreat(4) do not need retreat
-        robot.left_motor.spin_for_deg(-600)
-        robot.turn(-65)
-        thread_2.start()
-        # robot.advance(10)
-        robot.left_motor.spin_for_deg(1700)
-        robot.advance(37, 300, 0.979)
-        raise_up_front()
+        if push_east_bridge:
+            robot.left_motor.spin_for_deg(-700)
+            robot.turn(-65)
+            threading.Thread(target=go_to_cargo_connect_circle).start()
+            robot.left_motor.spin_for_deg(1700)
+            robot.advance(48, 300, 0.979)
+        else:
+            robot.turn(-65)
+            threading.Thread(target=release_hinged).start()
+            robot.advance(58, 300, 0.979)
+        raise_front_gate()
+        robot.retreat(17)
         robot.turn(32)
         robot.advance(28)
     
     if route_3_go_home:
-        pass
+        robot.retreat_without_acceleration(40)
+        robot.turn(15)
+        robot.retreat_without_acceleration(80)
 
 def lower_left_motor():
     robot.left_motor.spin_for_deg(-550)
@@ -172,7 +182,7 @@ def test_route_1():
 
     test_route_1_advance()
 
-def push_green_and_flip_engine():
+def push_green_and_switch_engine():
     robot.advance(24)
     robot.retreat(15)
 
@@ -192,7 +202,7 @@ def route_2():
     # time.sleep(0.1)
     # robot.turn(40)
     # time.sleep(0.1)
-    # push_green_and_flip_engine()
+    # push_green_and_switch_engine()
     pull_small_plane()
     # pull_big_plane()
     # robot.retreat(8)

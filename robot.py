@@ -148,10 +148,14 @@ class Robot:
         self.right_wheel.reset()
         self.left_wheel.set_vel(vel)
         self.right_wheel.set_vel(vel)
+        if vel > 0:
+            dif_scaling = Robot.straight_line_adherence_constant
+        elif vel < 0:
+            dif_scaling = -Robot.straight_line_adherence_constant
         while abs(self.left_wheel.get_deg()) < deg and abs(self.right_wheel.get_deg()) < deg:
             left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
             dif = right_deg - left_deg
-            self.start_moving_direction(dif * Robot.straight_line_adherence_constant, vel)
+            self.start_moving_direction(dif * dif_scaling, vel)
         self.left_wheel.set_scaling(Robot.left_scaling)
         self.stop()
     
@@ -161,6 +165,9 @@ class Robot:
     def retreat(self, cm: (int, float), vel: (int, float) = 500) -> None:
         self.advance(cm, -vel)
     
+    def retreat_without_acceleration(self, cm: (int, float), vel: (int, float) = 500) -> None:
+        self.advance_without_acceleration(cm, -vel)
+
     def turn(self, deg: (int, float), vel: (int, float) = 150) -> None:
         print("TURN", deg)
         if deg > 0:

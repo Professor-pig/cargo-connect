@@ -32,37 +32,37 @@ def func_2():
 
 
 def route_3():
-    from_home = True
-    stop_at_chicken = False
-    if from_home:
+    print("route 3")
+    route_3_stage_1 = True
+    route_3_stage_2 = False 
+    route_3_go_home = False # go home
+    if route_3_stage_1:
         arm_goes_back_with_pushing_west_bridge_thread = threading.Thread(target=arm_goes_back_with_pushing_west_bridge)
-        robot.left_motor.spin_for_deg(-1300) # push truck out home
+        robot.left_motor.spin_for_deg(-1200) # push truck out home
 
-        if stop_at_chicken:
-            robot.advance_with_gyro(60, 500)
-            time.sleep(0.5)
-            robot.left_motor.spin_for_deg(1200)
-        else:
-            robot.advance_without_acceleration(60, 500, 0.79)
-            # time.sleep(0.1)
-            # robot.left_motor.spin_for_deg(1200) # arm goes back, release truck
-            # robot.advance_without_acceleration(25, 500, 0.9) 
-            # robot.left_motor.spin_for_deg(-500) # arm goes out, preparing to push west bridge
-            # arm_goes_back_with_pushing_west_bridge_thread.start()
-            # robot.advance(36, 600, 0.9) # keep going and pushing west bridge
+        robot.advance_without_acceleration(63, 500, 0.79)
+        time.sleep(0.5)
+        robot.left_motor.spin_for_deg(2100)
+        robot.left_motor.spin_for_deg(-1100)
+        robot.advance_without_acceleration(22, 500, 0.9) 
+        robot.left_motor.spin_for_deg(-200) # arm goes out, preparing to push west bridge
+        threading.Thread(target=arm_goes_back_with_pushing_west_bridge).start()
+        robot.advance(37, 600, 0.9) # keep going and pushing west bridge
 
-
-    # if not stop_at_chicken:    
-    #     thread_2 = threading.Thread(target=func_2)
-    #     # robot.retreat(4) do not need retreat
-    #     robot.left_motor.spin_for_deg(-600)
-    #     robot.turn(-65)
-    #     thread_2.start()
-    #     robot.left_motor.spin_for_deg(2000)
-    #     robot.advance(27)
-    #     robot.right_motor.spin_for_deg(-100)
-    #     robot.turn(32)
-    #     # robot.advance(28)
+    if route_3_stage_2:
+        thread_2 = threading.Thread(target=func_2)
+        # robot.retreat(4) do not need retreat
+        robot.left_motor.spin_for_deg(-600)
+        robot.turn(-65)
+        thread_2.start()
+        robot.left_motor.spin_for_deg(2000)
+        robot.advance(27)
+        robot.right_motor.spin_for_deg(-100)
+        robot.turn(32)
+        robot.advance(28)
+    
+    if route_3_go_home:
+        pass
 
 def lower_left_motor():
     robot.left_motor.spin_for_deg(-550)
@@ -170,37 +170,39 @@ def test_route_1():
 
 def push_green_and_flip_engine():
     robot.advance(24)
-    robot.retreat(16)
+    robot.retreat(15)
 
 def pull_small_plane():
     robot.right_motor.spin_for_deg(1800)
 
 def pull_big_plane():
     robot.left_motor.spin_for_deg(-600)
+    time.sleep(0.5)
 
 def release_grey_cargo():
     robot.left_motor.spin_for_deg(600)
 
 def route_2():
-    print("route 2")
-    robot.advance(67, 300)
-    time.sleep(0.1)
-    robot.turn(40)
-    time.sleep(0.1)
-    push_green_and_flip_engine()
+    # print("route 2")
+    # robot.advance(67, 300)
+    # time.sleep(0.1)
+    # robot.turn(40)
+    # time.sleep(0.1)
+    # push_green_and_flip_engine()
     pull_small_plane()
-    pull_big_plane()
-    robot.retreat(8)
-    release_grey_cargo()
-    robot.retreat(40)
+    # pull_big_plane()
+    # robot.retreat(8)
+    # release_grey_cargo()
+    # robot.retreat(45)
 
 
 robot.brick.speaker.set_volume(5)
 debug = False
 if debug:
-    # route_1_go_home_with_pushing_helicopter()
-    robot.left_motor.spin_for_deg(-1300)
-    robot.advance_with_gyro(60, 500)
+    robot.left_motor.spin_for_deg(-1200) # push truck out home
+    time.sleep(1)
+    robot.left_motor.spin_for_deg(2100)
+    robot.left_motor.spin_for_deg(-900)
 else:    
     robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()

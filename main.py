@@ -29,12 +29,15 @@ def arm_goes_back_with_pushing_west_bridge():
 
 def func_2():
     robot.advance(10)
+    print("fun_2 end")
 
+def raise_up_front():
+    robot.right_motor.spin_for_deg(-300) 
 
 def route_3():
     print("route 3")
     route_3_stage_1 = True
-    route_3_stage_2 = False 
+    route_3_stage_2 = True 
     route_3_go_home = False # go home
     if route_3_stage_1:
         arm_goes_back_with_pushing_west_bridge_thread = threading.Thread(target=arm_goes_back_with_pushing_west_bridge)
@@ -55,9 +58,10 @@ def route_3():
         robot.left_motor.spin_for_deg(-600)
         robot.turn(-65)
         thread_2.start()
-        robot.left_motor.spin_for_deg(2000)
-        robot.advance(27)
-        robot.right_motor.spin_for_deg(-100)
+        # robot.advance(10)
+        robot.left_motor.spin_for_deg(1700)
+        robot.advance(37, 300, 0.979)
+        raise_up_front()
         robot.turn(32)
         robot.advance(28)
     
@@ -199,10 +203,7 @@ def route_2():
 robot.brick.speaker.set_volume(5)
 debug = False
 if debug:
-    robot.left_motor.spin_for_deg(-1200) # push truck out home
-    time.sleep(1)
-    robot.left_motor.spin_for_deg(2100)
-    robot.left_motor.spin_for_deg(-900)
+    robot.right_motor.spin_for_deg(-300) 
 else:    
     robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()

@@ -59,7 +59,7 @@ class Robot:
             time.sleep(0.01)
     
     def start_moving_direction(self, direction: (int, float) = 0, vel: (int, float) = 0):
-        print("START MOVING", vel, direction)
+        # print("START MOVING", vel, direction)
         if vel:
             left_vel = vel
             right_vel = vel
@@ -70,7 +70,7 @@ class Robot:
             right_vel *= 1 - direction / 50
         elif direction < 0:
             left_vel *= 1 + direction / 50
-        print(left_vel, right_vel)
+        # print(left_vel, right_vel)
         self.left_wheel.set_vel(left_vel)
         self.right_wheel.set_vel(right_vel)
         self.left_wheel.start()
@@ -100,6 +100,9 @@ class Robot:
             acceleration = -Robot.steady_acceleration_constant
             dif_scaling = -Robot.straight_line_adherence_constant
 
+        timeout = 0.5
+        previous_left_deg, previous_right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+        previous_time = time.time()
         while abs(self.left_wheel.get_deg()) < deg and abs(self.right_wheel.get_deg()) < deg:
             if abs(cur_vel) < abs(vel):
                 cur_vel += acceleration
@@ -108,6 +111,16 @@ class Robot:
             left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
             dif = right_deg - left_deg
             self.start_moving_direction(dif * dif_scaling, cur_vel)
+
+            if left_deg == previous_left_deg and right_deg == previous_right_deg:
+                # no more moving
+                if time.time() - previous_time > 0.5:
+                    break
+            else:
+                previous_left_deg = left_deg
+                previous_right_deg = right_deg
+                previous_time = time.time()
+
         self.stop()
         self.left_wheel.set_scaling(Robot.left_scaling)
     

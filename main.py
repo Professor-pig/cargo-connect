@@ -21,6 +21,8 @@ import threading
 robot = Robot()
 
 
+def arm_goes_out_to_parepare_to_push_west_bridge():
+    robot.left_motor.spin_for_deg(-200)
 
 def arm_goes_back_with_pushing_west_bridge():
     time.sleep(0.8)
@@ -42,10 +44,9 @@ def route_3():
     print("route 3")
     route_3_stage_1 = True
     route_3_stage_2 = True
-    route_3_go_home = True # go home
+    route_3_go_home = False # go home
     push_east_bridge = False
     if route_3_stage_1:
-        arm_goes_back_with_pushing_west_bridge_thread = threading.Thread(target=arm_goes_back_with_pushing_west_bridge)
         robot.left_motor.spin_for_deg(-1200) # push truck out home
 
         robot.advance_without_acceleration(63, 500, 0.79)
@@ -54,29 +55,36 @@ def route_3():
         robot.left_motor.spin_for_deg(-1100)
         robot.advance_without_acceleration(22, 500, 0.9) 
         robot.left_motor.spin_for_deg(-200) # arm goes out, preparing to push west bridge
+        # threading.Thread(target=arm_goes_out_to_parepare_to_push_west_bridge).start()
         threading.Thread(target=arm_goes_back_with_pushing_west_bridge).start()
-        robot.advance(37, 600, 0.9) # keep going and pushing west bridge
+        robot.advance(42.5, 500, 0.9) # keep going and pushing west bridge
 
     if route_3_stage_2:
+        time.sleep(0.1)
+        robot.retreat(6) # retreat to prepare to turn
+        time.sleep(0.1)
         if push_east_bridge:
             robot.left_motor.spin_for_deg(-700)
             robot.turn(-65)
             threading.Thread(target=go_to_cargo_connect_circle).start()
             robot.left_motor.spin_for_deg(1700)
-            robot.advance(48, 300, 0.979)
+            robot.advance(53, 300, 0.979)
         else:
-            robot.turn(-65)
+            robot.turn(-60)
             threading.Thread(target=release_hinged).start()
-            robot.advance(58, 300, 0.979)
+            robot.advance(67, 300, 0.979)
         raise_front_gate()
-        robot.retreat(17)
+        robot.retreat(5, 300)
+        time.sleep(0.1)
         robot.turn(32)
-        robot.advance(28)
+        robot.advance(26)
     
-    if route_3_go_home:
-        robot.retreat_without_acceleration(40)
-        robot.turn(15)
-        robot.retreat_without_acceleration(80)
+        if route_3_go_home:
+            robot.retreat_without_acceleration(40)
+            robot.turn(15)
+            robot.retreat_without_acceleration(80)
+        else:
+            robot.retreat(10)
 
 def lower_left_motor():
     robot.left_motor.spin_for_deg(-550)
@@ -108,20 +116,20 @@ def push_train():
     robot.advance(74)
     raise_left_motor()
 
-def route_1_go_home_with_pushing_helicopter():
-    # push helicopter
-    robot.retreat(33, 300)
-    robot.turn(51)
-    robot.retreat(16, 300)
+# def route_1_go_home_with_pushing_helicopter():
+#     # push helicopter
+#     robot.retreat(33, 300)
+#     robot.turn(51)
+#     robot.retreat(16, 300)
 
-    # return home
-    robot.advance(34, 300)
-    robot.turn(40)
-    robot.advance(73, 300)
-    robot.turn(-31)
-    robot.advance(24, 300)
-    robot.turn(47)
-    robot.advance_without_acceleration(70, 1000)
+#     # return home
+#     robot.advance(34, 300)
+#     robot.turn(40)
+#     robot.advance(73, 300)
+#     robot.turn(-30)
+#     robot.advance(24, 300)
+#     robot.turn(42)
+#     robot.advance_without_acceleration(63, 500)
 
 def route_1():
     print("route1")
@@ -129,39 +137,33 @@ def route_1():
     time.sleep(0.1)
     robot.turn(33)
     
-    # threading.Thread(target=lower_left_motor).start()
-
-    do_not_push = True
-    if do_not_push:    
-        robot.advance(85, 300, 0.98)
-    else:
-        robot.advance(34, 300, 0.979)
-        #push
-        lower_left_motor()
-        robot.advance_without_acceleration(14, 400, 0.7)
-    
-        #raise up arm
-        raise_left_motor()
-    
-        robot.advance(30, 300, 0.979)
-    
+    robot.advance(85, 500, 0.98)
     time.sleep(0.1)
     robot.turn(89)
-    time.sleep(0.1)
+
     put_down_fork()
-    robot.advance(26, 300, 0.979)
-    lift_fork()
+    robot.advance(27, 400, 0.979)
     lower_left_motor()
-    raise_left_motor()
     
+    threading.Thread(target=lift_fork).start()
+    threading.Thread(target=raise_left_motor).start()
     robot.retreat(41, 300)
 
     # push train
     lower_left_motor()
-    robot.advance(41, 300)
-    raise_left_motor()
+    robot.advance(43, 300)    
+    time.sleep(0.1)
 
-    route_1_go_home_with_pushing_helicopter()
+    #go home
+    threading.Thread(target=raise_left_motor).start()
+    robot.retreat(19)
+    time.sleep(0.1)
+    robot.turn(87)
+    robot.advance(86, 500, 0.98)
+    robot.turn(-29)
+    robot.advance(25, 300)
+    robot.turn(34)
+    robot.advance_without_acceleration(65, 1000)
 
 def route_4():
     # robot.advance(73, 300, 0.979)
@@ -197,23 +199,23 @@ def release_grey_cargo():
     robot.left_motor.spin_for_deg(600)
 
 def route_2():
-    # print("route 2")
-    # robot.advance(67, 300)
-    # time.sleep(0.1)
-    # robot.turn(40)
-    # time.sleep(0.1)
-    # push_green_and_switch_engine()
+    print("route 2")
+    robot.advance(67, 300)
+    time.sleep(0.1)
+    robot.turn(40)
+    time.sleep(0.1)
+    push_green_and_switch_engine()
     pull_small_plane()
-    # pull_big_plane()
-    # robot.retreat(8)
-    # release_grey_cargo()
-    # robot.retreat(45)
+    pull_big_plane()
+    robot.retreat(8)
+    release_grey_cargo()
+    robot.retreat(45)
 
 
 robot.brick.speaker.set_volume(5)
 debug = False
 if debug:
-    robot.right_motor.spin_for_deg(-300) 
+    robot.retreat(10)
 else:    
     robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()

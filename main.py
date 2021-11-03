@@ -40,6 +40,9 @@ def release_hinged():
 def raise_front_gate():
     robot.right_motor.spin_for_deg(-300)
 
+def close_front_gate():
+    robot.right_motor.spin_for_deg(300)
+
 def route_3():
     print("route 3")
     route_3_stage_1 = True
@@ -72,12 +75,15 @@ def route_3():
         else:
             robot.turn(-60)
             threading.Thread(target=release_hinged).start()
-            robot.advance(67, 300, 0.979)
+            robot.advance(64, 300, 0.979)
         raise_front_gate()
-        robot.retreat(5, 300)
         time.sleep(0.1)
-        robot.turn(32)
-        robot.advance(26)
+        robot.retreat(7, 300)
+        time.sleep(0.1)
+        robot.turn(30)
+        time.sleep(0.1)
+        close_front_gate()
+        robot.advance(13)
     
         if route_3_go_home:
             robot.retreat_without_acceleration(40)
@@ -137,7 +143,7 @@ def route_1():
     time.sleep(0.1)
     robot.turn(33)
     
-    robot.advance(85, 500, 0.98)
+    robot.advance(85, 400, 0.98)
     time.sleep(0.1)
     robot.turn(89)
 

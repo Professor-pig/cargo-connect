@@ -57,6 +57,7 @@ class Motor:
         self.device.run_time(vel, milliseconds, Motor.stopping[stop_mode], wait)
     
     def spin_for_deg(self, deg: int, vel: (int, float) = 2000, stop_mode: str = "", wait: bool = True) -> None:
+        print("spin_for_deg", deg)
         if not stop_mode:
             stop_mode = self.stop_mode
         if not vel:

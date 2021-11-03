@@ -176,6 +176,7 @@ class Robot:
         self.drivebase.straight(cm * 10)
     
     def retreat(self, cm: (int, float), vel: (int, float) = 500) -> None:
+        print("RETREAT", cm)
         self.advance(cm, -vel)
     
     def retreat_without_acceleration(self, cm: (int, float), vel: (int, float) = 500) -> None:

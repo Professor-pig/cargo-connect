@@ -28,7 +28,6 @@ def arm_goes_back_with_pushing_west_bridge():
     time.sleep(0.8)
     robot.left_motor.spin_for_deg(600)
 
-
 def go_to_cargo_connect_circle():
     robot.advance(10)
     print("fun_2 end")
@@ -110,35 +109,13 @@ def put_down_fork():
 def lift_fork():
     robot.right_motor.spin_for_deg(-305)
 
-def push_helicopter():
-    robot.retreat(74, 300)
-    robot.turn(51)
-    robot.retreat(16, 300)
-    robot.advance(16, 300)
-    robot.turn(-51)
-
 def push_train():
     lower_left_motor()
     robot.advance(74)
     raise_left_motor()
 
-# def route_1_go_home_with_pushing_helicopter():
-#     # push helicopter
-#     robot.retreat(33, 300)
-#     robot.turn(51)
-#     robot.retreat(16, 300)
-
-#     # return home
-#     robot.advance(34, 300)
-#     robot.turn(40)
-#     robot.advance(73, 300)
-#     robot.turn(-30)
-#     robot.advance(24, 300)
-#     robot.turn(42)
-#     robot.advance_without_acceleration(63, 500)
-
 def route_1():
-    print("route1")
+    print("route 1")
     robot.advance(84, 300, 0.979)
     time.sleep(0.1)
     robot.turn(33)
@@ -176,30 +153,15 @@ def route_4():
     # time.sleep(0.1)
     robot.pivot(30, 300)
 
-def test_route_1():
-    def test_route_1_turn():
-        angle_offset = 2
-        for _ in range(4):
-            # robot.pivot(90)
-            # robot.turn(-90 + angle_offset, 100)
-            robot.turn(90 - angle_offset, 100)
-            time.sleep(0.5)
-
-    def test_route_1_advance():
-        robot.advance(100, 300, 0.965)
-
-    test_route_1_advance()
-
 def push_green_and_switch_engine():
     robot.advance(24)
-    robot.retreat(15)
+    robot.retreat(17, 300)
 
 def pull_small_plane():
     robot.right_motor.spin_for_deg(1800)
 
 def pull_big_plane():
-    robot.left_motor.spin_for_deg(-600)
-    time.sleep(0.5)
+    robot.left_motor.spin_for_deg(-700)
 
 def release_grey_cargo():
     robot.left_motor.spin_for_deg(600)
@@ -211,8 +173,8 @@ def route_2():
     robot.turn(40)
     time.sleep(0.1)
     push_green_and_switch_engine()
-    pull_small_plane()
     pull_big_plane()
+    pull_small_plane()
     robot.retreat(8)
     release_grey_cargo()
     robot.retreat(45)

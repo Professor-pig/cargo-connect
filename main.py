@@ -148,11 +148,6 @@ def route_1():
     robot.turn(34)
     robot.advance_without_acceleration(65, 1000)
 
-def route_4():
-    # robot.advance(73, 300, 0.979)
-    # time.sleep(0.1)
-    robot.pivot(30, 300)
-
 def push_green_and_switch_engine():
     robot.advance(24)
     robot.retreat(17, 300)
@@ -179,11 +174,40 @@ def route_2():
     release_grey_cargo()
     robot.retreat(45)
 
+def h_bar_go_out():
+    robot.right_motor.spin_for_deg(4000)
+
+def h_bar_go_back():
+    robot.right_motor.spin_for_deg(-4000)
+
+def retreat_after_push_crane():
+    robot.retreat(10, 100)
+
+def route_4():
+    print("route 1")
+    robot.advance(76, 300, 0.979)
+    time.sleep(0.1)
+    robot.turn(33)
+    robot.advance(39, 300, 0.979)
+    time.sleep(0.1)
+    robot.turn(-81)
+    robot.advance(18, 300, 0.979)
+    time.sleep(0.1)
+    h_bar_go_out()
+    threading.Thread(target=retreat_after_push_crane).start()
+    h_bar_go_back()
+    robot.turn(-43)
+    robot.advance(31, 300, 0.979)
+    robot.turn(-45)
+
 
 robot.brick.speaker.set_volume(5)
 debug = False
 if debug:
-    robot.retreat(10)
+    # robot.advance(10, 300)
+    h_bar_go_out()
+    robot.retreat(10, 300)
+    h_bar_go_back()
 else:    
     robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()

@@ -174,40 +174,46 @@ def route_2():
     release_grey_cargo()
     robot.retreat(45)
 
-def h_bar_go_out():
+def crane_pusher_go_out():
     robot.right_motor.spin_for_deg(4000)
 
-def h_bar_go_back():
-    robot.right_motor.spin_for_deg(-4000)
+def pull_back_crane_pusher():
+    robot.right_motor.spin_for_deg(-4050)
 
-def retreat_after_push_crane():
-    robot.retreat(10, 100)
+def accidence_avoidance():
+    robot.advance_without_acceleration(6.8, 120)
+
+def push_small_truck():
+    robot.left_motor.spin_for_deg(-300, 500)
+    threading.Thread(target=accidence_avoidance).start()
+    robot.left_motor.spin_for_deg(-1300)
 
 def route_4():
     print("route 1")
     robot.advance(76, 300, 0.979)
     time.sleep(0.1)
     robot.turn(33)
-    robot.advance(39, 300, 0.979)
+    robot.advance(37.5, 300, 0.95)
     time.sleep(0.1)
-    robot.turn(-81)
-    robot.advance(18, 300, 0.979)
+    robot.turn(-85)
+    robot.advance(20, 300, 0.979)
     time.sleep(0.1)
-    h_bar_go_out()
-    threading.Thread(target=retreat_after_push_crane).start()
-    h_bar_go_back()
+    crane_pusher_go_out()
+    # threading.Thread(target=pull_back_crane_pusher).start()
+    pull_back_crane_pusher()
+    robot.retreat(10, 150)
     robot.turn(-43)
-    robot.advance(31, 300, 0.979)
-    robot.turn(-45)
+    robot.advance(41.5, 300, 1.21)
+    robot.turn(-12)
+    time.sleep(0.2)
+    robot.retreat_without_acceleration(3, 500)
+    push_small_truck()
 
 
 robot.brick.speaker.set_volume(5)
 debug = False
 if debug:
-    # robot.advance(10, 300)
-    h_bar_go_out()
-    robot.retreat(10, 300)
-    h_bar_go_back()
+    push_small_truck()
 else:    
     robot.brick.speaker.beep(440, 200)
     attachment_color = robot.colour_middle.color()

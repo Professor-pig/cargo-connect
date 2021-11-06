@@ -88,8 +88,8 @@ def route_3():
             robot.retreat_without_acceleration(40)
             robot.turn(15)
             robot.retreat_without_acceleration(80)
-        else:
-            robot.retreat(10)
+        # else:
+        #     robot.retreat(10)
 
 def lower_left_motor():
     robot.left_motor.spin_for_deg(-550)
@@ -210,21 +210,28 @@ def route_4():
     push_small_truck()
 
 
-robot.brick.speaker.set_volume(5)
+robot.brick.speaker.set_volume(10)
 debug = False
 if debug:
     push_small_truck()
-else:    
+else:
+    # print(f"Battery:", robot.brick.battery.voltage())
     robot.brick.speaker.beep(440, 200)
-    attachment_color = robot.colour_middle.color()
-    print(attachment_color)
-    if attachment_color == parameters.Color.YELLOW:
-        route_4()
-    elif attachment_color == parameters.Color.RED:
-        route_1()
-    elif attachment_color == parameters.Color.BLUE:
-        route_3()
-    elif attachment_color == parameters.Color.BLACK:
-        route_2()
-
-robot.brick.speaker.beep(440, 200)
+    while True:
+        if parameters.Button.CENTER in robot.brick.buttons.pressed():
+            # wait for release
+            while parameters.Button.CENTER in robot.brick.buttons.pressed():
+                time.sleep(0.1)
+            
+            attachment_color = robot.colour_middle.color()
+            print(attachment_color)
+            robot.brick.speaker.beep(440, 200)
+            if attachment_color == parameters.Color.RED:
+                route_1()
+            elif attachment_color == parameters.Color.BLACK:
+                route_2()
+            elif attachment_color == parameters.Color.BLUE:
+                route_3()
+            elif attachment_color == parameters.Color.YELLOW:
+                route_4()
+            robot.brick.speaker.beep(440, 200)

@@ -175,13 +175,14 @@ def route_2():
     robot.retreat(45)
 
 def crane_pusher_go_out():
-    robot.right_motor.spin_for_deg(4000)
+    robot.right_motor.spin_for_deg(2500)
 
 def pull_back_crane_pusher():
-    robot.right_motor.spin_for_deg(-4050)
+    robot.right_motor.spin_for_deg(-2030)
 
 def accidence_avoidance():
-    robot.advance_without_acceleration(6.8, 120)
+    robot.advance_to_colour(parameters.Color.BLACK, 100)
+    robot.advance_without_acceleration(2.9, 75)
 
 def push_small_truck():
     robot.left_motor.spin_for_deg(-300, 500)
@@ -190,33 +191,33 @@ def push_small_truck():
 
 def route_4():
     print("route 1")
-    robot.advance(76, 300, 0.979)
-    time.sleep(0.1)
-    robot.turn(33)
-    robot.advance(37.5, 300, 0.95)
-    time.sleep(0.1)
-    robot.turn(-85)
-    robot.advance(20, 300, 0.979)
-    time.sleep(0.1)
+    # robot.advance(76, 300, 0.979)
+    # time.sleep(0.1)
+    # robot.turn(33)
+    # robot.advance(37.5, 300, 0.95)
+    # time.sleep(0.1)
+    # robot.turn(-85)
+    # robot.advance(20, 300, 0.979)
+    # time.sleep(0.1)
     crane_pusher_go_out()
-    # threading.Thread(target=pull_back_crane_pusher).start()
-    pull_back_crane_pusher()
+    threading.Thread(target=lambda: robot.right_motor.spin_for_deg(-2520)).start()
+    # robot.right_motor.spin_for_deg(-4050)
     robot.retreat(10, 150)
     robot.turn(-43)
     robot.advance(41.5, 300, 1.21)
-    robot.turn(-12)
+    robot.turn(-10)
     time.sleep(0.2)
     robot.retreat_without_acceleration(3, 500)
     push_small_truck()
 
 
-robot.brick.speaker.set_volume(10)
+robot.brick.speaker.set_volume(20)
 debug = False
+robot.brick.speaker.beep(440, 200)
 if debug:
-    push_small_truck()
+    robot.retreat(20, 300)
 else:
     # print(f"Battery:", robot.brick.battery.voltage())
-    robot.brick.speaker.beep(440, 200)
     while True:
         if parameters.Button.CENTER in robot.brick.buttons.pressed():
             # wait for release

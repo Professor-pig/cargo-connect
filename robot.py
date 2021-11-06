@@ -1,10 +1,6 @@
-# from pybricks.hubs import EV3Brick
 import pybricks.hubs as hub
-# from pybricks.ev3devices import Motor, ColorSensor, InfraredSensor, GyroSensor
 import pybricks.ev3devices as devices
-# from pybricks.parameters import Port, Stop, Direction, Button, Color
 import pybricks.parameters as parameters
-# from pybricks.robotics import DriveBase
 import pybricks.robotics as robotics
 import motor
 import time
@@ -41,10 +37,13 @@ class Robot:
         self.calibrate_gyro()
     
     def reset_motors(self) -> None:
+        self.reset_wheels()
         self.left_motor.reset()
+        self.right_motor.reset()
+    
+    def reset_wheels(self):
         self.left_wheel.reset()
         self.right_wheel.reset()
-        self.right_motor.reset()
 
     def calibrate_gyro(self, delay: int = 0.1) -> None:
         self.reset_gyro()
@@ -70,7 +69,6 @@ class Robot:
             right_vel *= 1 - direction / 50
         elif direction < 0:
             left_vel *= 1 + direction / 50
-        # print(left_vel, right_vel)
         self.left_wheel.set_vel(left_vel)
         self.right_wheel.set_vel(right_vel)
         self.left_wheel.start()
@@ -128,11 +126,35 @@ class Robot:
         print("ADVANCE", cm)
         self.advance_by_deg(cm * Robot.c_to_d, vel, left_scaling)
     
+    def advance_to_colour(self, colour: parameters.Color = parameters.Color.BLACK, vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
+        if left_scaling:
+            self.left_wheel.set_scaling(left_scaling)
+        self.reset_wheels()
+        cur_vel = 0
+        if vel > 0:
+            acceleration = Robot.steady_acceleration_constant
+            dif_scaling = Robot.straight_line_adherence_constant
+        elif vel < 0:
+            acceleration = -Robot.steady_acceleration_constant
+            dif_scaling = -Robot.straight_line_adherence_constant
+
+        while self.colour_right.color() != colour:
+            print(self.colour_right.color())
+            if abs(cur_vel) < abs(vel):
+                cur_vel += acceleration
+                self.left_wheel.set_vel(cur_vel)
+                self.right_wheel.set_vel(cur_vel)
+            left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+            dif = right_deg - left_deg
+            self.start_moving_direction(dif * dif_scaling, cur_vel)
+
+        self.stop()
+        self.left_wheel.set_scaling(Robot.left_scaling)
+    
     def advance_with_gyro(self, cm: (int, float), vel: (int, float) = 300) -> None:
         print("advance_with_gyro ", cm)
         self.left_wheel.set_scaling(1)
-        self.left_wheel.reset()
-        self.right_wheel.reset()
+        self.reset_wheels()
         deg = cm * Robot.c_to_d
         angle = self.gyro.angle()
         cur_vel = 0
@@ -157,8 +179,7 @@ class Robot:
         deg = cm * Robot.c_to_d
         if left_scaling:
             self.left_wheel.set_scaling(left_scaling)
-        self.left_wheel.reset()
-        self.right_wheel.reset()
+        self.reset_wheels()
         self.left_wheel.set_vel(vel)
         self.right_wheel.set_vel(vel)
         if vel > 0:
@@ -188,7 +209,7 @@ class Robot:
             direction = 100
         elif deg < 0:
             direction = -100
-        self.reset_motors()
+        self.reset_wheels()
         self.reset_gyro()
         self.start_moving_direction(direction, vel)
         deg = abs(deg)
@@ -213,7 +234,7 @@ class Robot:
             direction = 50
         elif deg < 0:
             direction = -50
-        self.reset_motors()
+        self.reset_wheels()
         self.reset_gyro()
         self.start_moving_direction(direction, vel)
         deg = abs(deg)

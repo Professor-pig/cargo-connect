@@ -42,8 +42,13 @@ class Robot:
         self.right_motor.reset()
     
     def reset_wheels(self):
-        self.left_wheel.reset()
-        self.right_wheel.reset()
+        start = time.time()
+        while self.left_wheel.get_deg() or self.right_wheel.get_deg():
+            self.left_wheel.reset()
+            self.right_wheel.reset()
+        #     print("RESET: DEG", self.left_wheel.get_deg(), self.right_wheel.get_deg())
+        #     print("RESET: VEL", self.left_wheel.get_vel(), self.right_wheel.get_vel())
+        # print("RESET TIME:", time.time() - start)
 
     def calibrate_gyro(self, delay: int = 0.1) -> None:
         self.reset_gyro()
@@ -84,12 +89,13 @@ class Robot:
             stop_mode = self.stop_mode
         self.left_wheel.stop(stop_mode)
         self.right_wheel.stop(stop_mode)
+        self.left_wheel.set_vel(0)
+        self.right_wheel.set_vel(0)
 
     def advance_by_deg(self, deg: (int, float), vel: (int, float) = 1000, left_scaling: float = 0.0) -> None:
         if left_scaling:
             self.left_wheel.set_scaling(left_scaling)
-        self.left_wheel.reset()
-        self.right_wheel.reset()
+        self.reset_wheels()
         cur_vel = 0
         if vel > 0:
             acceleration = Robot.steady_acceleration_constant
@@ -108,6 +114,7 @@ class Robot:
                 self.right_wheel.set_vel(cur_vel)
             left_deg, right_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
             dif = right_deg - left_deg
+            print(left_deg, right_deg)
             self.start_moving_direction(dif * dif_scaling, cur_vel)
 
             if left_deg == previous_left_deg and right_deg == previous_right_deg:
@@ -123,8 +130,9 @@ class Robot:
         self.left_wheel.set_scaling(Robot.left_scaling)
     
     def advance(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
-        print("ADVANCE", cm)
+        print("ADVANCE", cm, "START")
         self.advance_by_deg(cm * Robot.c_to_d, vel, left_scaling)
+        print("ADVANCE", cm, "END")
     
     def advance_to_colour(self, colour: parameters.Color = parameters.Color.BLACK, vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
         if left_scaling:
@@ -196,15 +204,16 @@ class Robot:
     def advance_drivebase(self, cm):
         self.drivebase.straight(cm * 10)
     
-    def retreat(self, cm: (int, float), vel: (int, float) = 500) -> None:
-        print("RETREAT", cm)
-        self.advance(cm, -vel)
-    
-    def retreat_without_acceleration(self, cm: (int, float), vel: (int, float) = 500) -> None:
-        self.advance_without_acceleration(cm, -vel)
+    def retreat(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
+        print("RETREAT", cm, "START")
+        self.advance(cm, -vel, left_scaling)
+        print("RETREAT", cm, "END")
+
+    def retreat_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
+        self.advance_without_acceleration(cm, -vel, left_scaling)
 
     def turn(self, deg: (int, float), vel: (int, float) = 150) -> None:
-        print("TURN", deg)
+        print("TURN", deg, "START")
         if deg > 0:
             direction = 100
         elif deg < 0:
@@ -227,9 +236,10 @@ class Robot:
                 break
             time.sleep(0.01)
         self.stop()
+        print("TURN", deg, "END")
     
     def pivot(self, deg: (int, float), vel: (int, float) = 150) -> None:
-        print("PIVOT", deg)
+        print("PIVOT", deg, "START")
         if deg > 0:
             direction = 50
         elif deg < 0:
@@ -245,3 +255,4 @@ class Robot:
                 break
             time.sleep(0.01)
         self.stop()
+        print("PIVOT", deg, "END")

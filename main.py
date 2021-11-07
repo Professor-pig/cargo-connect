@@ -1,19 +1,8 @@
 #!/usr/bin/env pybricks-micropython
-
-# from pybricks.hubs import EV3Brick
 import pybricks.hubs as hub
-
-# from pybricks.ev3devices import Motor, ColorSensor, InfraredSensor, GyroSensor
 import pybricks.ev3devices as devices
-
-# from pybricks.parameters import Port, Stop, Direction, Button, Color
 import pybricks.parameters as parameters
 
-# from pybricks.tools import wait, StopWatch, DataLog
-
-# from pybricks.robotics import DriveBase
-
-# from pybricks.media.ev3dev import SoundFile, ImageFile
 import time
 from robot import Robot
 import threading
@@ -21,16 +10,12 @@ import threading
 robot = Robot()
 
 
-def arm_goes_out_to_parepare_to_push_west_bridge():
-    robot.left_motor.spin_for_deg(-200)
-
-def arm_goes_back_with_pushing_west_bridge():
-    time.sleep(0.8)
-    robot.left_motor.spin_for_deg(600)
+def withdraw_arm_from_bridge():
+    time.sleep(2)
+    robot.left_motor.spin_for_deg(650)
 
 def go_to_cargo_connect_circle():
     robot.advance(10)
-    print("fun_2 end")
 
 def release_hinged():
     time.sleep(0.3)
@@ -49,17 +34,15 @@ def route_3():
     route_3_go_home = False # go home
     push_east_bridge = False
     if route_3_stage_1:
-        robot.left_motor.spin_for_deg(-1200) # push truck out home
+        robot.left_motor.spin_for_deg(-1300) # push truck out home
 
-        robot.advance_without_acceleration(63, 500, 0.79)
+        robot.advance_without_acceleration(60, 600, 0.79)
         time.sleep(0.5)
-        robot.left_motor.spin_for_deg(2100)
-        robot.left_motor.spin_for_deg(-1100)
-        robot.advance_without_acceleration(22, 500, 0.9) 
-        robot.left_motor.spin_for_deg(-200) # arm goes out, preparing to push west bridge
-        # threading.Thread(target=arm_goes_out_to_parepare_to_push_west_bridge).start()
-        threading.Thread(target=arm_goes_back_with_pushing_west_bridge).start()
-        robot.advance(42.5, 500, 0.9) # keep going and pushing west bridge
+        robot.left_motor.spin_for_deg(2200)
+        robot.advance_without_acceleration(4.5, 500, 0.9) 
+        robot.left_motor.spin_for_deg(-1350)
+        threading.Thread(target=withdraw_arm_from_bridge).start()
+        robot.advance_without_acceleration(59, 500, 0.9)
 
     if route_3_stage_2:
         time.sleep(0.1)
@@ -82,14 +65,15 @@ def route_3():
         robot.turn(30)
         time.sleep(0.1)
         close_front_gate()
-        robot.advance(13)
+        time.sleep(0.1)
+        robot.advance_without_acceleration(14, 500)
     
         if route_3_go_home:
             robot.retreat_without_acceleration(40)
             robot.turn(15)
             robot.retreat_without_acceleration(80)
-        # else:
-        #     robot.retreat(10)
+        else:
+            robot.retreat_without_acceleration(10, 1000)
 
 def lower_left_motor():
     robot.left_motor.spin_for_deg(-550)
@@ -119,13 +103,11 @@ def route_1():
     robot.advance(84, 300, 0.979)
     time.sleep(0.1)
     robot.turn(33)
-    
     robot.advance(85, 400, 0.98)
     time.sleep(0.1)
     robot.turn(89)
-
     put_down_fork()
-    robot.advance(27, 400, 0.979)
+    robot.advance(25, 400, 0.979)
     lower_left_motor()
     
     threading.Thread(target=lift_fork).start()
@@ -137,16 +119,16 @@ def route_1():
     robot.advance(43, 300)    
     time.sleep(0.1)
 
-    #go home
+    # go home
     threading.Thread(target=raise_left_motor).start()
     robot.retreat(19)
     time.sleep(0.1)
     robot.turn(87)
-    robot.advance(86, 500, 0.98)
-    robot.turn(-29)
-    robot.advance(25, 300)
-    robot.turn(34)
-    robot.advance_without_acceleration(65, 1000)
+    robot.advance(86, 1000, 0.98)
+    robot.turn(-25, 1000)
+    robot.advance(25, 1000)
+    robot.turn(28, 1000)
+    robot.advance(65, 1000)
 
 def push_green_and_switch_engine():
     robot.advance(24)
@@ -172,7 +154,7 @@ def route_2():
     pull_small_plane()
     robot.retreat(8)
     release_grey_cargo()
-    robot.retreat(45)
+    robot.retreat_without_acceleration(50, 1000, 1.3)
 
 def crane_pusher_go_out():
     robot.right_motor.spin_for_deg(2500)
@@ -190,15 +172,15 @@ def push_small_truck():
     robot.left_motor.spin_for_deg(-1300)
 
 def route_4():
-    print("route 1")
-    # robot.advance(76, 300, 0.979)
-    # time.sleep(0.1)
-    # robot.turn(33)
-    # robot.advance(37.5, 300, 0.95)
-    # time.sleep(0.1)
-    # robot.turn(-85)
-    # robot.advance(20, 300, 0.979)
-    # time.sleep(0.1)
+    print("route 4")
+    robot.advance(76, 300, 0.979)
+    time.sleep(0.1)
+    robot.turn(33)
+    robot.advance(37.5, 300, 0.95)
+    time.sleep(0.1)
+    robot.turn(-85)
+    robot.advance(20, 300, 0.979)
+    time.sleep(0.1)
     crane_pusher_go_out()
     threading.Thread(target=lambda: robot.right_motor.spin_for_deg(-2520)).start()
     # robot.right_motor.spin_for_deg(-4050)
@@ -215,7 +197,9 @@ robot.brick.speaker.set_volume(20)
 debug = False
 robot.brick.speaker.beep(440, 200)
 if debug:
-    robot.retreat(20, 300)
+    robot.advance(10, 300)
+    # time.sleep(1)
+    robot.retreat(7, 300)
 else:
     # print(f"Battery:", robot.brick.battery.voltage())
     while True:

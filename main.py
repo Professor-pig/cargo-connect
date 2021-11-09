@@ -124,10 +124,10 @@ def route_1():
     robot.retreat(19)
     time.sleep(0.1)
     robot.turn(87)
-    robot.advance(86, 1000, 0.98)
-    robot.turn(-25, 1000)
-    robot.advance(25, 1000)
-    robot.turn(28, 1000)
+    robot.advance(86, 500, 0.98)
+    robot.turn(-29)
+    robot.advance(25, 300)
+    robot.turn(34)
     robot.advance(65, 1000)
 
 def push_green_and_switch_engine():
@@ -157,10 +157,11 @@ def route_2():
     robot.retreat_without_acceleration(50, 1000, 1.3)
 
 def crane_pusher_go_out():
-    robot.right_motor.spin_for_deg(2500)
+    # robot.right_motor.spin_for_deg(2500)
+    robot.right_motor.spin_for_deg(4000)
 
 def pull_back_crane_pusher():
-    robot.right_motor.spin_for_deg(-2030)
+    robot.right_motor.spin_for_deg(-4050)
 
 def accidence_avoidance():
     robot.advance_to_colour(parameters.Color.BLACK, 100)
@@ -176,14 +177,14 @@ def route_4():
     robot.advance(76, 300, 0.979)
     time.sleep(0.1)
     robot.turn(33)
-    robot.advance(37.5, 300, 0.95)
+    robot.advance(38.5, 300, 0.95)
     time.sleep(0.1)
     robot.turn(-85)
-    robot.advance(20, 300, 0.979)
+    robot.advance(20.5, 300, 0.979)
     time.sleep(0.1)
     crane_pusher_go_out()
-    threading.Thread(target=lambda: robot.right_motor.spin_for_deg(-2520)).start()
-    # robot.right_motor.spin_for_deg(-4050)
+    # robot.right_motor.spin_for_deg(-2520)
+    threading.Thread(target=lambda: robot.right_motor.spin_for_deg(-4000)).start()
     robot.retreat(10, 150)
     robot.turn(-43)
     robot.advance(41.5, 300, 1.21)

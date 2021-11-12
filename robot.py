@@ -42,13 +42,16 @@ class Robot:
         self.right_motor.reset()
     
     def reset_wheels(self):
-        start = time.time()
-        while self.left_wheel.get_deg() or self.right_wheel.get_deg():
+        # start = time.time()
+        left_wheel_deg, right_wheel_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
+        while left_wheel_deg or right_wheel_deg:
             self.left_wheel.reset()
             self.right_wheel.reset()
+            left_wheel_deg, right_wheel_deg = self.left_wheel.get_deg(), self.right_wheel.get_deg()
         #     print("RESET: DEG", self.left_wheel.get_deg(), self.right_wheel.get_deg())
         #     print("RESET: VEL", self.left_wheel.get_vel(), self.right_wheel.get_vel())
         # print("RESET TIME:", time.time() - start)
+        print("After reset wheels", left_wheel_deg, right_wheel_deg)
 
     def calibrate_gyro(self, delay: int = 0.1) -> None:
         self.reset_gyro()
@@ -74,10 +77,12 @@ class Robot:
             right_vel *= 1 - direction / 50
         elif direction < 0:
             left_vel *= 1 + direction / 50
+        print("vel:", left_vel, right_vel)
         self.left_wheel.set_vel(left_vel)
         self.right_wheel.set_vel(right_vel)
         self.left_wheel.start()
         self.right_wheel.start()
+        print("speed", self.left_wheel.get_speed(), self.right_wheel.get_speed())
     
     def set_stop_mode(self, value: str) -> None:
         self.stop_mode = value
@@ -184,6 +189,7 @@ class Robot:
         self.left_wheel.set_scaling(Robot.left_scaling)
     
     def advance_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
+        print("ADVANCE WITHOUT ACCELERATION", cm, "START")
         deg = cm * Robot.c_to_d
         if left_scaling:
             self.left_wheel.set_scaling(left_scaling)
@@ -200,10 +206,24 @@ class Robot:
             self.start_moving_direction(dif * dif_scaling, vel)
         self.left_wheel.set_scaling(Robot.left_scaling)
         self.stop()
+        print("ADVANCE WITHOUT ACCELERATION", cm, "END")    
     
     def advance_drivebase(self, cm):
         self.drivebase.straight(cm * 10)
     
+    def advance_time(self, sec: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0):
+        print("ADVANCE TIME", sec, "START")
+        if left_scaling:
+            self.left_wheel.set_scaling(left_scaling)
+        self.reset_wheels()
+        target = time.time() + sec
+        self.start_moving_direction(0, vel)
+        while time.time() < target:
+            time.sleep(0.01)
+        self.stop()
+        self.left_wheel.set_scaling(Robot.left_scaling)
+        print("ADVANCE TIME", sec, "END")
+
     def retreat(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
         print("RETREAT", cm, "START")
         self.advance(cm, -vel, left_scaling)
@@ -211,6 +231,11 @@ class Robot:
 
     def retreat_without_acceleration(self, cm: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0) -> None:
         self.advance_without_acceleration(cm, -vel, left_scaling)
+    
+    def retreat_time(self, sec: (int, float), vel: (int, float) = 500, left_scaling: float = 0.0):
+        print("RETREAT TIME", sec, "START")
+        self.advance_time(sec, -vel, left_scaling)
+        print("RETREAT TIME", sec, "END")
 
     def turn(self, deg: (int, float), vel: (int, float) = 150) -> None:
         print("TURN", deg, "START")
@@ -228,7 +253,8 @@ class Robot:
             if abs(angle - last_angle) > 10:
                 print(angle)
                 print("wrong angle")
-                self.reset_gyro()
+                self.gyro.reset_angle(last_angle + 1)
+                print(last_angle)
                 continue
             print(angle, deg)
             last_angle = angle

@@ -46,6 +46,7 @@ class Motor:
     
     def start(self) -> None:
         self.device.run(self.vel * self.scaling)
+        # print("motor run with ", self.vel * self.scaling)
     
     def spin_for_time(self, milliseconds: (int, float), vel: (int, float) = 2000, stop_mode: str = "", wait: bool = True) -> None:
         if not stop_mode:
@@ -80,3 +81,6 @@ class Motor:
 
     def hold(self):
          self.device.hold()   
+
+    def get_speed(self) -> float:
+        return self.device.speed()

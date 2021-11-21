@@ -30,7 +30,7 @@ class Robot:
 
         self.left_wheel.set_scaling(Robot.left_scaling)
         self.reset_and_calibrate()
-        self.stop_mode = "brake"
+        self.stop_mode = "hold"
     
     def reset_and_calibrate(self) -> None:
         self.reset_motors()
